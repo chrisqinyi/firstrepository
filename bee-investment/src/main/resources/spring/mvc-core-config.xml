@@ -87,7 +87,7 @@
 		(Bootstrap, jQuery...) -->
 	<mvc:resources mapping="/webjars/**"
 		location="classpath:/META-INF/resources/webjars/" />
-	<mvc:resources mapping="/res-${ibnk.jersey.build.verion}/**"
+	<mvc:resources mapping="/res-${investment.build.verion}/**"
 		location="/, classpath:/resources/" order="1" cache-period="${browser.cache.seconds}" />
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -101,8 +101,8 @@
 		<!-- <property name="useExpiresHeader" value="true" /> -->
 	</bean>
 	<bean id="baseIBankController" class="org.financial.foa.base.BaseIBankController" abstract="true">
-		<property name="version" value="${ibnk.jersey.build.verion}" />
-		<property name="tabletDevices" value="${ibnk.jersey.tabletDevices}" />
+		<property name="version" value="${investment.build.verion}" />
+		<property name="tabletDevices" value="${investment.tabletDevices}" />
 	</bean>
 	<mvc:view-controller path="/" view-name="welcome" />
 	<bean id="remoter" class="org.financial.foa.base.Remoter">
