@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.beeInvestment</groupId>
-	<artifactId>bee-investment</artifactId>
+	<artifactId>bee-investment-web</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
-	<name>beeinvestment</name>
+	<name>Bee Investment Web</name>
 	<packaging>war</packaging>
 
 	<properties>
@@ -437,7 +437,7 @@
 				<version>2.13</version>
 				<configuration>
 					<includes>
-						<include>**/*Tests.java</include>
+						<include>org/beeInvestment/model/*Tests.java</include>
 					</includes>
 				</configuration>
 			</plugin>

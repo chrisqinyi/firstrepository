@@ -6,7 +6,7 @@ import java.util.List;
 
 
 
-public class Account {
+public class Account extends BaseEntity{
 	private BigDecimal balance;
 	public BigDecimal getBalance() {
 		return balance;
