@@ -12,7 +12,6 @@ import org.directwebremoting.servlet.UrlProcessor;
  * time. As a result network load and bandwidth can be optimized.
  * The caching will exclude dynamic DWR call which contains business
  * data.
- * @author 1411068
  */
 public class HttpCachingInterfaceProcessor extends UrlProcessor {
     /**

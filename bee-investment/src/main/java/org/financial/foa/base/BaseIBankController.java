@@ -11,9 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
-import ua_parser.Client;
-import ua_parser.Parser;
-
 public class BaseIBankController implements BeanFactoryAware {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -58,11 +55,11 @@ public class BaseIBankController implements BeanFactoryAware {
      */
     protected String generateRedirectURL(HttpServletRequest request, String url) throws IOException {
         String clientDevice = request.getHeader("User-Agent");
-        Parser uaParser = new Parser();
-        Client c = uaParser.parse(clientDevice);
+      //  Parser uaParser = new Parser();
+       // Client c = uaParser.parse(clientDevice);
         logger.warn("User-Agent: " + clientDevice);
-        logger.warn("uaParser - UserAgent - Family: " + c.userAgent.family);
-        logger.warn("uaParser - Device - Family: " + c.device.family);
+       // logger.warn("uaParser - UserAgent - Family: " + c.userAgent.family);
+        //logger.warn("uaParser - Device - Family: " + c.device.family);
 //        if (clientDevice.toLowerCase().contains(MOBILE) && !tabletDeviceList.contains(c.device.family)) {
 //            return REDIRECT_MOBILE + url + REDIRECT_HTML;
 //        }

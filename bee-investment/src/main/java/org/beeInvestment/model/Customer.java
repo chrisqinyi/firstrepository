@@ -3,7 +3,15 @@ package org.beeInvestment.model;
 import java.util.List;
 import java.util.Map;
 
-public class Customer {
+import org.beeInvestment.repository.CredentialRepository;
+import org.beeInvestment.repository.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class Customer extends org.beeInvestment.model.BaseEntity {
+	@Autowired
+	private CredentialRepository credentialRepository;
+	@Autowired
+	private Repository<Audit> auditRepository;
 	private boolean authenticated;
 	public boolean isAuthenticated() {
 		return authenticated;
@@ -12,16 +20,11 @@ public class Customer {
 	public void setAuthenticated(boolean authenticated) {
 		this.authenticated = authenticated;
 	}
-
+	//@Autowired
 	private Account account;
+//	@Autowired
+	private Profile profile;
 
-	public Account getAccount() {
-		return account;
-	}
-
-	public void setAccount(Account account) {
-		this.account = account;
-	}
 
 	public CreditAssignment offerInvestment(Investment originalInvestment) {
 		// TODO Auto-generated method stub
@@ -32,6 +35,14 @@ public class Customer {
 			CreditAssignment assignment) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 
 	public Deposit deposit(Deposit deposit) {
@@ -64,9 +75,11 @@ public class Customer {
 		
 	}
 
-	public CredentialHistory updateCredential(Credential credential) {
-		// TODO Auto-generated method stub
-		return null;
+	public Audit updateCredential(Credential credential) {
+		credentialRepository.save(credential);
+		Audit t = new Audit();
+		auditRepository.save(t);
+		return t;
 	}
 
 	public List<CreditAssignment> getCreditAssignmentList() {
