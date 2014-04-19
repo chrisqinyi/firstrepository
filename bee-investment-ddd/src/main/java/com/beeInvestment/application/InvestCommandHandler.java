@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import pl.com.bottega.cqrs.annotations.CommandHandlerAnnotation;
 import pl.com.bottega.cqrs.command.handler.CommandHandler;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.AggregateId;
+import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 import com.beeInvestment.account.domain.AccountRepository;
 import com.beeInvestment.customer.domain.CustomerRepository;
@@ -22,7 +23,7 @@ public class InvestCommandHandler implements CommandHandler<InvestCommand, Void>
 	public Void handle(InvestCommand command) {
 		
 		Target target=targetRepository.load(new AggregateId(command.getTargetId()));
-		target.invest(customerRepository.load(new AggregateId(command.getCustomerId())).generateSnapshot(),command.getFund());
+		target.invest(customerRepository.load(new AggregateId(command.getCustomerId())).generateSnapshot(),new Money(command.getFund()));
 		targetRepository.save(target);
 		return null;
 	}

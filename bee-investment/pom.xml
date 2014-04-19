@@ -70,6 +70,11 @@
 	</properties>
 
 	<dependencies>
+			<dependency>
+			<groupId>org.beeInvestment</groupId>
+			<artifactId>bee-investment-command</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>

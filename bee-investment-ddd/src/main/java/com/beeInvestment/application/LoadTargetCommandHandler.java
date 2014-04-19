@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import pl.com.bottega.cqrs.annotations.CommandHandlerAnnotation;
 import pl.com.bottega.cqrs.command.handler.CommandHandler;
+import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 import com.beeInvestment.investment.domain.Target;
 import com.beeInvestment.investment.domain.TargetFactory;
@@ -19,7 +20,7 @@ public class LoadTargetCommandHandler implements
 
 	@Override
 	public Void handle(LoadTargetCommand command) {
-		Target target = targetFactory.create(command.getTotalFund(),
+		Target target = targetFactory.create(new Money(command.getTotalFund()),
 				command.getInterestRate(), command.getPeriods());
 		// InvestCommand command = new InvestCommand();
 		// command.setFund(new Money(new BigDecimal(5000)));
