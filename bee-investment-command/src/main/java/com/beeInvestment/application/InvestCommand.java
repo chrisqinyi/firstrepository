@@ -1,14 +1,15 @@
 package com.beeInvestment.application;
 
+import java.math.BigDecimal;
+
 import pl.com.bottega.cqrs.annotations.Command;
-import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 @Command()
 public class InvestCommand {
 	private final String targetId;
-	private final Money fund;
+	private final BigDecimal fund;
 	private final String customerId;
-	public Money getFund() {
+	public BigDecimal getFund() {
 		return fund;
 	}
 
@@ -20,7 +21,7 @@ public class InvestCommand {
 		return customerId;
 	}
 
-	public InvestCommand(String targetId,String customerId, Money fund) {
+	public InvestCommand(String targetId,String customerId, BigDecimal fund) {
 		super();
 		this.fund = fund;
 		this.targetId = targetId;
