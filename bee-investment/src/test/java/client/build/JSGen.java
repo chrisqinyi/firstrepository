@@ -19,6 +19,7 @@ public class JSGen {
         return StringUtils.replace(input, SINGLE_QUOTE, JS_OUT_SINGLE_QUOTE);
     }
 
+    @SuppressWarnings("unused")
     private static String genVarfromHBS(String srcFilesPath) throws IOException {
         File srcFP = new File(srcFilesPath);
         if (!srcFP.exists() || !srcFP.isDirectory()) {
@@ -69,7 +70,7 @@ public class JSGen {
         StringBuffer sb = new StringBuffer();
 
         for (File jsFile : jsFiles) {
-            String jsFileContent = convert2JSVar(IOTools.getFileContent(jsFile.getPath(), true));
+            String jsFileContent = IOTools.getFileContent(jsFile.getPath(), true);
             sb.append(jsFileContent);
         }
 
@@ -77,8 +78,9 @@ public class JSGen {
     }
 
     private static void genJS(String srcPath, String outPath) throws IOException {
-        String f = JSGen.genVarfromHBS(srcPath);
-        f = f + JSGen.getJSContent(srcPath);
+        // String f = JSGen.genVarfromHBS(srcPath);
+        // f = f + JSGen.getJSContent(srcPath);
+        String f = JSGen.getJSContent(srcPath);
         if (f != "") {
             IOTools.outputFile(outPath, IOTools.getOutputFileName(srcPath) + ".js", f);
         }

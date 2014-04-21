@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 public class Constant {
 
     public static final String STRING_EMPTY = "";
+    public static final String HTML_LINE_BREAK = "\n";
 
     public static final String TYPE_LIB = "lib";
     public static final String TYPE_FEATURES = "features";

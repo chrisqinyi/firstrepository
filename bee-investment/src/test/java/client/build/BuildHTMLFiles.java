@@ -18,21 +18,25 @@ public class BuildHTMLFiles {
 
         if (subGroupPath.length > 0) {
             for (File subPath : subGroupPath) {
-                buildHTML(subPath.getName());
+                buildHTML(subPath.getName(), subPath.getPath());
             }
         }
     }
 
-    public static void buildHTML(String featureName) throws IOException {
+    public static void buildHTML(String featureName, String featurePath) throws IOException {
         StringBuffer sb = new StringBuffer();
         // Board -1
         sb.append(IOTools.getFileContent(Constant.IO_SRC_BOARD_PATH + "/board_1.hbs", true));
         // CSS
         sb.append(BuildCSSFiles.getCSSLinkString(featureName));
-        // JS
-        sb.append(BuildJSFiles.getJSLinkString(featureName));
         // Board -2
         sb.append(IOTools.getFileContent(Constant.IO_SRC_BOARD_PATH + "/board_2.hbs", true));
+        // Base HBS
+        sb.append(HbsGen.outputBaseHbsStr(Constant.IO_SRC_BASE_PATH));
+        // Feature HBS
+        sb.append(HbsGen.outputSpecialHbsStr(featurePath));
+        // JS
+        sb.append(BuildJSFiles.getJSLinkString(featureName));
         // Board -3
         sb.append(IOTools.getFileContent(Constant.IO_SRC_BOARD_PATH + "/board_3.hbs", true));
         // Output
