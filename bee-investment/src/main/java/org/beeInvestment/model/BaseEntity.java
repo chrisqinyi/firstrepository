@@ -23,33 +23,33 @@ import javax.persistence.MappedSuperclass;
 import org.joda.time.DateTime;
 
 /**
- * Simple JavaBean domain object with an id property. Used as a base class for objects needing this property.
- *
+ * Simple JavaBean domain object with an id property. Used as a base class for
+ * objects needing this property.
+ * 
  * @author Ken Krebs
  * @author Juergen Hoeller
  */
 @MappedSuperclass
 public class BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	protected Integer id;
 
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public boolean isNew() {
+		return (this.id == null);
+	}
 
-    public boolean isNew() {
-        return (this.id == null);
-    }
-    
-    protected boolean deleted;
+	protected boolean deleted;
 
-    public DateTime getCreateDate() {
+	public DateTime getCreateDate() {
 		return createDate;
 	}
 
@@ -66,9 +66,9 @@ public class BaseEntity {
 	}
 
 	private DateTime createDate;
-    
-    private DateTime updateDate;
-    
+
+	private DateTime updateDate;
+
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -76,6 +76,11 @@ public class BaseEntity {
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
-    
+
+	public boolean equals(BaseEntity obj) {
+		if (null == obj)
+			return false;
+		return this.getId() == obj.getId();
+	}
 
 }

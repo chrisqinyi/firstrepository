@@ -22,22 +22,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.beeInvestment.model.BaseEntity;
 import org.springframework.orm.hibernate3.support.OpenSessionInViewFilter;
-import org.springframework.samples.petclinic.model.BaseEntity;
-import org.springframework.samples.petclinic.repository.OwnerRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * JPA implementation of the {@link OwnerRepository} interface.
- * 
- * @author Mike Keith
- * @author Rod Johnson
- * @author Sam Brannen
- * @author Michael Isvy
- * @since 22.4.2006
- */
 @Repository
-public class JpaRepositoryImpl<T extends BaseEntity> {
+public class JpaRepositoryImpl<T extends BaseEntity> implements org.beeInvestment.repository.Repository<T> {
 
 	public JpaRepositoryImpl(Class<T> type) {
 		this.jpql = "SELECT DISTINCT item FROM " + type.getSimpleName()
@@ -67,6 +57,7 @@ public class JpaRepositoryImpl<T extends BaseEntity> {
 	 * lazy-loading and using {@link OpenSessionInViewFilter}
 	 */
 
+
 	public Collection<T> find(Map<String, Object> parameterMap) {
 		String jpql=this.jpql;
 		if(!parameterMap.isEmpty()){
@@ -93,12 +84,14 @@ public class JpaRepositoryImpl<T extends BaseEntity> {
 		return query.getResultList();
 	}
 
+
 	public T findById(int id) {
 		Query query = this.em.createQuery(jpql+" WHERE item.id =:id");
 		query.setParameter("id", id);
 		return (T) query.getSingleResult();
 	}
 
+	@Override
 	public void save(T t) {
 		if (t.getId() == null) {
 			this.em.persist(t);

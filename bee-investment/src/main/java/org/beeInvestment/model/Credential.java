@@ -1,5 +1,5 @@
 package org.beeInvestment.model;
 
-public class Credential {
+public class Credential extends BaseEntity {
 private boolean valid;
 }
