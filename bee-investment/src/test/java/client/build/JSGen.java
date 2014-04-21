@@ -5,8 +5,6 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
-import org.springframework.util.StringUtils;
-
 public class JSGen {
 
     public static final String VAR = "var ";
@@ -15,7 +13,7 @@ public class JSGen {
     public static final String JS_OUT_SINGLE_QUOTE = "\\'";
     public static final String SEMICOLON = ";";
 
-    private static String convert2JSVar(String input) {
+   /* private static String convert2JSVar(String input) {
         return StringUtils.replace(input, SINGLE_QUOTE, JS_OUT_SINGLE_QUOTE);
     }
 
@@ -49,7 +47,7 @@ public class JSGen {
         }
 
         return sb.toString();
-    }
+    }*/
 
     private static String getJSContent(String srcFilesPath) throws IOException {
         File srcFP = new File(srcFilesPath);
