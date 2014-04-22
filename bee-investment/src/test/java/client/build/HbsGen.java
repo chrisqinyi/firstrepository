@@ -9,9 +9,9 @@ public class HbsGen {
 
     private static String genHbsHtmlStr(String id, String content) {
         StringBuffer sb = new StringBuffer();
-        sb.append("<script type=\"text/x-handlebars\" id=\"");
+        sb.append("<script id=\"");
         sb.append(id);
-        sb.append("\">");
+        sb.append("\" type=\"text/x-handlebars\">");
         sb.append(Constant.HTML_LINE_BREAK);
         sb.append(content);
         sb.append("</script>");
