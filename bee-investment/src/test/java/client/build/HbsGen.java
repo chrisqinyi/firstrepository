@@ -5,6 +5,8 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
+import org.springframework.util.StringUtils;
+
 public class HbsGen {
 
     private static String genHbsHtmlStr(String id, String content) {
@@ -41,6 +43,7 @@ public class HbsGen {
         for (File hbsFile : hbsFiles) {
             if (hbsFile.length() > 0) {
                 String hbsFileName = IOTools.getFileName(hbsFile.getPath());
+                hbsFileName = StringUtils.replace(hbsFileName, "_", "/");
                 String hbsFileContent = IOTools.getFileContent(hbsFile.getPath(), true);
                 sb.append(genHbsHtmlStr(hbsFileName, hbsFileContent) + Constant.HTML_LINE_BREAK);
             }
