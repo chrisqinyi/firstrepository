@@ -12,7 +12,7 @@ import com.beeInvestment.customer.domain.Customer;
 @ContextConfiguration(locations = {"classpath:spring/business-config.xml","classpath:spring/abstractSessionTest.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles({"jpa","model"})
-public class BaseTestCase {
+public abstract class BaseTestCase {
 //	@Autowired
 //	protected Customer customer;
 //	@Autowired
