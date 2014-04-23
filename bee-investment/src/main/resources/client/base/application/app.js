@@ -1,5 +1,3 @@
-Todos = Ember.Application.create();
+window.Todos = Ember.Application.create();
 
-Todos.ApplicationAdapter = DS.LSAdapter.create({
-    namespace : 'Work_Space-todos-emberjs'
-});
+Todos.ApplicationAdapter = DS.FixtureAdapter.extend();
