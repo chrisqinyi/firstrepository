@@ -10,14 +10,26 @@ import pl.com.bottega.ecommerce.sales.acceptancetests.TestHelper;
 public class TestEventListener {
 	@Inject
 	private TestHelper testHelper;
+
 	@EventListener
-	public void handle(RegisterEvent event){
-		testHelper.setCustomerId(event.getCustomerId());
-		
+	public void handle(RegisterEvent event) {
+		String customerId = event.getCustomerId();
+		if (null == testHelper.getCustomerAId())
+			testHelper.setCustomerAId(customerId);
+		else
+			testHelper.setCustomerBId(customerId);
+
 	}
+
 	@EventListener
-	public void handle(LoadTargetEvent event){
-		testHelper.setTargetId(event.getTargetId());
-		
+	public void handle(LoadTargetEvent event) {
+		String targetId = event.getTargetId();
+		if (null == testHelper.getTarget1Id())
+			testHelper.setTarget1Id(targetId);
+		else if (null == testHelper.getTarget2Id())
+			testHelper.setTarget2Id(targetId);
+		else
+			testHelper.setTarget3Id(targetId);
+
 	}
 }

@@ -12,13 +12,13 @@ import com.beeInvestment.application.RegisterCommand;
 public class CredentialFactory {
 	@Inject
 	private AutowireCapableBeanFactory spring;
-	public UsernamePasswordCredential createLogin(Customer customer) {
+	UsernamePasswordCredential createLogin(Customer customer) {
 		UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredential(customer);
 		spring.autowireBean(usernamePasswordCredential);
 		return usernamePasswordCredential;
 	}
 
-	public SecurityQuestionCredential createSecurityQuestion(Customer customer) {
+	SecurityQuestionCredential createSecurityQuestion(Customer customer) {
 		SecurityQuestionCredential securityQuestionCredential = new SecurityQuestionCredential(customer);
 		spring.autowireBean(securityQuestionCredential);
 		return securityQuestionCredential;

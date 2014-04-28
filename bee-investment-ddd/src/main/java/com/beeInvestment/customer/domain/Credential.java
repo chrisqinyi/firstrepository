@@ -19,7 +19,7 @@ public abstract class Credential extends BaseEntity{
 	//@OrderColumn(name = "itemNumber")
 	@JoinColumn(name = "customer_id")
 	protected Customer customer;
-	public void removeCustomer(){
+	void removeCustomer(){
 		this.customer=null;
 	}
 	

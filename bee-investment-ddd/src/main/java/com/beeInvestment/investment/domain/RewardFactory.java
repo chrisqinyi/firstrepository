@@ -14,7 +14,7 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 public class RewardFactory {
 	@Inject
 	private AutowireCapableBeanFactory spring;
-	public Reward create(BigDecimal periodIndex, Money rewardFund,Investment investment){
+	Reward create(BigDecimal periodIndex, Money rewardFund,Investment investment){
 		AggregateId aggregateId=AggregateId.generate();
 		Reward reward = new Reward(aggregateId,periodIndex, rewardFund, investment);
 		spring.autowireBean(reward);

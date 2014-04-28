@@ -9,16 +9,19 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 import com.beeInvestment.account.domain.Account;
 import com.beeInvestment.account.domain.AccountRepository;
-import com.beeInvestment.customer.domain.Customer;
 import com.beeInvestment.customer.domain.CustomerRepository;
+import com.beeInvestment.investment.domain.Investment;
 import com.beeInvestment.investment.domain.Target;
 import com.beeInvestment.investment.domain.TargetRepository;
-import com.beeInvestment.payment.domain.Payment;
 import com.beeInvestment.payment.domain.PaymentRepository;
+import com.beeInvestment.transaction.domain.Transaction;
+import com.beeInvestment.transaction.domain.TransactionRepository;
 
 @CommandHandlerAnnotation
 public class InvestCommandHandler implements
-		CommandHandler<InvestCommand, Void> {
+		CommandHandler<InvestCommand, Investment> {
+	@Inject
+	private TransactionRepository transactionRepository;
 	@Inject
 	private TargetRepository targetRepository;
 	@Inject
@@ -28,7 +31,7 @@ public class InvestCommandHandler implements
 //	@Inject
 	private PaymentRepository paymentRepository;
 	@Override
-	public Void handle(InvestCommand command) {
+	public Investment handle(InvestCommand command) {
 		Target target = targetRepository.load(new AggregateId(command
 				.getTargetId()));
 		AggregateId customerId = new AggregateId(command.getCustomerId());
@@ -41,9 +44,10 @@ public class InvestCommandHandler implements
 			throw new RuntimeException("customer has insufficent money");
 //		Payment payment = account.charge(new Money(command.getFund()));
 //		paymentRepository.save(payment);
-		target.invest(account, new Money(command.getFund()));
-		accountRepository.save(account);
-		targetRepository.save(target);
+		Transaction t=target.invest(account, new Money(command.getFund()));
+		//accountRepository.save(account);
+		//targetRepository.save(target);
+		transactionRepository.save(t);
 		return null;
 	}
 

@@ -21,10 +21,13 @@ package pl.com.bottega.cqrs.command.impl;
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import pl.com.bottega.cqrs.command.handler.CommandHandler;
 
 import com.beeInvestment.transaction.domain.Transaction;
+import com.beeInvestment.transaction.domain.TransactionRepository;
+import com.beeInvestment.transaction.domain.TransactionStatus;
 
 /**
  * @author Slawek
@@ -35,10 +38,11 @@ public class RunEnvironment {
 	public interface HandlersProvider {
 		CommandHandler<Object, Object> getHandler(Object command);
 	}
-
+	@Inject
+	private TransactionRepository transactionRepository;
 	@Inject
 	private HandlersProvider handlersProfiver;
-
+	@Transactional	
 	public Object run(Object command) {
 		CommandHandler<Object, Object> handler = handlersProfiver
 				.getHandler(command);
@@ -48,13 +52,19 @@ public class RunEnvironment {
 		// commands, etc
 
 		Object result = handler.handle(command);
-//		if (result instanceof Transaction) {
-//			System.out.println("RunEnvironment process");
-//			((Transaction)result).process();
-//		}
 		// You can add Your own capabilities here
-
+		if (result instanceof Transaction) {
+			Transaction transaction = (Transaction)result;
+			if (transaction.getStatus().equals(TransactionStatus.PROCESSING)) {
+				transaction.process();
+//				transaction.close();
+				transactionRepository.save(transaction);
+			}
+		}
+		
 		return result;
 	}
+
+
 
 }

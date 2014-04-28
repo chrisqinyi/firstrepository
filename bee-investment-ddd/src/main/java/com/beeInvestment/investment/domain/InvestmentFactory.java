@@ -15,7 +15,7 @@ public class InvestmentFactory {
 	@Inject
 	private AutowireCapableBeanFactory spring;
 	
-	public Investment create(Target target,Account account,Money fund){
+	Investment create(Target target,Account account,Money fund){
 		AggregateId aggregateId=AggregateId.generate();
 		Investment investment = new Investment(aggregateId,target,account,fund);
 		spring.autowireBean(investment);

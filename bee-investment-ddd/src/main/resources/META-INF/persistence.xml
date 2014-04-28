@@ -24,6 +24,8 @@
 		transaction-type="RESOURCE_LOCAL">
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<class>com.beeInvestment.account.domain.Account</class>
+		<class>com.beeInvestment.account.domain.Income</class>
+		<class>com.beeInvestment.account.domain.Outgo</class>
 		<class>com.beeInvestment.audit.domain.Audit</class>
 		<class>com.beeInvestment.customer.domain.Customer</class>
 		<class>com.beeInvestment.customer.domain.SecurityQuestionCredential</class>

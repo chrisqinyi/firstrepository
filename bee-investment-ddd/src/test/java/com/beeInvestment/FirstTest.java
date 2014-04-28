@@ -38,6 +38,7 @@ import com.beeInvestment.application.ApproveTargetCommand;
 import com.beeInvestment.application.DepositCommand;
 import com.beeInvestment.application.InvestCommand;
 import com.beeInvestment.application.LoadTargetCommand;
+import com.beeInvestment.application.PublishTargetCommand;
 import com.beeInvestment.application.RegisterCommand;
 import com.beeInvestment.application.RewardCommand;
 import com.beeInvestment.application.TransferCommand;
@@ -66,14 +67,15 @@ public class FirstTest {
 //	targetRepository.save(target);
 	
 	gate.dispatch(new RegisterCommand());
-	assertThat(testHelper.getCustomerId(),notNullValue());
-	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerId()));
+	assertThat(testHelper.getCustomerAId(),notNullValue());
+	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerAId()));
 	gate.dispatch(new LoadTargetCommand(new BigDecimal(10000),new BigDecimal(1.3), new BigDecimal(12)));
-	assertThat(testHelper.getTargetId(),notNullValue());
-	gate.dispatch(new DepositCommand(testHelper.getCustomerId(),new BigDecimal(10001)));
+	assertThat(testHelper.getTarget1Id(),notNullValue());
+	gate.dispatch(new PublishTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new DepositCommand(testHelper.getCustomerAId(),new BigDecimal(10001)));
 	expectedEx.expect(RuntimeException.class);
     expectedEx.expectMessage("investment fund cannot be less than 100.00");
-    gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(10)));
+    gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(10)));
 	
 }
 @Test
@@ -88,14 +90,15 @@ public void test2(){
 //	targetRepository.save(target);
 	
 	gate.dispatch(new RegisterCommand());
-	assertThat(testHelper.getCustomerId(),notNullValue());
-	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerId()));
+	assertThat(testHelper.getCustomerAId(),notNullValue());
+	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerAId()));
 	gate.dispatch(new LoadTargetCommand(new BigDecimal(10000),new BigDecimal(1.3), new BigDecimal(12)));
-	assertThat(testHelper.getTargetId(),notNullValue());
-	gate.dispatch(new DepositCommand(testHelper.getCustomerId(),new BigDecimal(10001)));
+	assertThat(testHelper.getTarget1Id(),notNullValue());
+	gate.dispatch(new PublishTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new DepositCommand(testHelper.getCustomerAId(),new BigDecimal(10001)));
 	expectedEx.expect(RuntimeException.class);
     expectedEx.expectMessage("remaining investment fund cannot be less than 100.00");
-    gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(9990)));
+    gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(9990)));
 	
 	
 }
@@ -111,14 +114,15 @@ public void test3(){
 //	targetRepository.save(target);
 	
 	gate.dispatch(new RegisterCommand());
-	assertThat(testHelper.getCustomerId(),notNullValue());
-	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerId()));
+	assertThat(testHelper.getCustomerAId(),notNullValue());
+	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerAId()));
 	gate.dispatch(new LoadTargetCommand(new BigDecimal(10000),new BigDecimal(1.3), new BigDecimal(12)));
-	assertThat(testHelper.getTargetId(),notNullValue());
-	gate.dispatch(new DepositCommand(testHelper.getCustomerId(),new BigDecimal(20001)));
+	assertThat(testHelper.getTarget1Id(),notNullValue());
+	gate.dispatch(new PublishTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new DepositCommand(testHelper.getCustomerAId(),new BigDecimal(20001)));
 	expectedEx.expect(RuntimeException.class);
     expectedEx.expectMessage("no enough remaining investment fund");
-    gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(10300)));
+    gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(10300)));
 	
 }
 @Test
@@ -133,15 +137,16 @@ public void test4(){
 //	targetRepository.save(target);
 	
 	gate.dispatch(new RegisterCommand());
-	assertThat(testHelper.getCustomerId(),notNullValue());
-	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerId()));
+	assertThat(testHelper.getCustomerAId(),notNullValue());
+	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerAId()));
 	gate.dispatch(new LoadTargetCommand(new BigDecimal(10000),new BigDecimal(1.3), new BigDecimal(12)));
-	gate.dispatch(new DepositCommand(testHelper.getCustomerId(),new BigDecimal(10101)));
-	assertThat(testHelper.getTargetId(),notNullValue());
-    gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(10000)));
+	gate.dispatch(new PublishTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new DepositCommand(testHelper.getCustomerAId(),new BigDecimal(10101)));
+	assertThat(testHelper.getTarget1Id(),notNullValue());
+    gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(10000)));
 	expectedEx.expect(RuntimeException.class);
     expectedEx.expectMessage("target full");
-    gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(100)));	
+    gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(100)));	
 	
 }
 @Test
@@ -156,16 +161,17 @@ public void test5(){
 //	targetRepository.save(target);
 	
 	gate.dispatch(new RegisterCommand());
-	assertThat(testHelper.getCustomerId(),notNullValue());
-	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerId()));
+	assertThat(testHelper.getCustomerAId(),notNullValue());
+	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerAId()));
 	gate.dispatch(new LoadTargetCommand(new BigDecimal(10000),new BigDecimal(1.3), new BigDecimal(12)));
-	assertThat(testHelper.getTargetId(),notNullValue());
-	gate.dispatch(new DepositCommand(testHelper.getCustomerId(),new BigDecimal(10001)));
-	gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(5000)));
-    gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(5000)));
+	assertThat(testHelper.getTarget1Id(),notNullValue());
+	gate.dispatch(new PublishTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new DepositCommand(testHelper.getCustomerAId(),new BigDecimal(10001)));
+	gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(5000)));
+    gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(5000)));
 	//expectException();
-	gate.dispatch(new ApproveTargetCommand(testHelper.getTargetId()));
-	gate.dispatch(new RewardCommand(testHelper.getTargetId(),new BigDecimal(1)));
+	gate.dispatch(new ApproveTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new RewardCommand(testHelper.getTarget1Id(),new BigDecimal(1)));
 	
 }
 @Test
@@ -180,19 +186,20 @@ public void test6(){
 //	targetRepository.save(target);
 	
 	gate.dispatch(new RegisterCommand());
-	assertThat(testHelper.getCustomerId(),notNullValue());
-	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerId()));
+	assertThat(testHelper.getCustomerAId(),notNullValue());
+	gate.dispatch(new UpdateLoginCredentialCommand(testHelper.getCustomerAId()));
 	gate.dispatch(new LoadTargetCommand(new BigDecimal(10000),new BigDecimal(1.3), new BigDecimal(12)));
-	assertThat(testHelper.getTargetId(),notNullValue());
-	gate.dispatch(new DepositCommand(testHelper.getCustomerId(),new BigDecimal(10001)));
-	gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(5000)));
-    gate.dispatch(new InvestCommand(testHelper.getTargetId(),testHelper.getCustomerId(),new BigDecimal(5000)));
+	assertThat(testHelper.getTarget1Id(),notNullValue());
+	gate.dispatch(new PublishTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new DepositCommand(testHelper.getCustomerAId(),new BigDecimal(10001)));
+	gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(5000)));
+    gate.dispatch(new InvestCommand(testHelper.getTarget1Id(),testHelper.getCustomerAId(),new BigDecimal(5000)));
 	//expectException();
-	gate.dispatch(new ApproveTargetCommand(testHelper.getTargetId()));
-	gate.dispatch(new RewardCommand(testHelper.getTargetId(),new BigDecimal(1)));
+	gate.dispatch(new ApproveTargetCommand(testHelper.getTarget1Id()));
+	gate.dispatch(new RewardCommand(testHelper.getTarget1Id(),new BigDecimal(1)));
 	gate.dispatch(new RegisterCommand());
-	assertThat(testHelper.getCustomerId(),notNullValue());
-	gate.dispatch(new TransferCommand(testHelper.getTargetId(),new BigDecimal(1),testHelper.getCustomerId()));
+	assertThat(testHelper.getCustomerAId(),notNullValue());
+	gate.dispatch(new TransferCommand(testHelper.getTarget1Id(),new BigDecimal(0),testHelper.getCustomerAId()));
 	
 }
 }

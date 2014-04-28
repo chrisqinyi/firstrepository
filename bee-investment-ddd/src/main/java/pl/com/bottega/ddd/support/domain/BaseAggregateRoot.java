@@ -18,6 +18,8 @@
  */
 package pl.com.bottega.ddd.support.domain;
 
+import java.io.Serializable;
+
 import javax.inject.Inject;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -45,7 +47,7 @@ import pl.com.bottega.ecommerce.sharedkernel.exceptions.DomainOperationException
 // created in domain factories, not in spring container, therefore we don't want
 // eager creation
 @MappedSuperclass
-public abstract class BaseAggregateRoot {
+public abstract class BaseAggregateRoot{
 	@Inject
 	@Transient
 	protected AutowireCapableBeanFactory spring;

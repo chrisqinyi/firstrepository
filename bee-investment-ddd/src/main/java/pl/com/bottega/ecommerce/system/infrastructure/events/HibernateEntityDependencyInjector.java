@@ -18,12 +18,13 @@ import org.springframework.stereotype.Component;
 
 import pl.com.bottega.ddd.support.domain.DomainEventPublisher;
 
-import com.beeInvestment.application.AccountSavedEvent;
-import com.beeInvestment.transaction.domain.Transaction;
-
 @Component
 public class HibernateEntityDependencyInjector implements
 		PostLoadEventListener, MergeEventListener,PostInsertEventListener,PostUpdateEventListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7242659076643733270L;
 	@Inject
 	private AutowireCapableBeanFactory spring;
 

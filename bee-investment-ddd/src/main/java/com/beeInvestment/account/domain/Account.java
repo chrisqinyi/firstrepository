@@ -1,8 +1,10 @@
 package com.beeInvestment.account.domain;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -39,22 +41,42 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 	@Transient
 	@Inject
 	private DepositFactory depositFactory;
-
+	@Transient
+	@Inject
+	private WithdrawFactory withdrawFactory;
+	@Transient
+	@Inject
+	private IncomeFactory incomeFactory;
+	@Transient
+	@Inject
+	private OutgoFactory outgoFactory;
 	private Account() {
 	}
-
+	private boolean frozen;
+	public void freeze(){
+		frozen=true;
+	} 
+	boolean isFrozen() {
+		return frozen;
+	}
+	public Withdraw withdraw(Money amount){
+		if(frozen){
+			domainError("Account frozen!");
+		}
+		if (!canAfford(amount)) {
+			domainError("Can not afford: " + amount);
+		}
+		Withdraw withdraw = withdrawFactory.create(this, amount);
+		return withdraw;
+	}
 	public Deposit deposit(Money amount) {
 		Deposit deposit = depositFactory.create(this, amount);
-		//deposit.confirm();
-		//deposit.process();
-		//deposit.close();
-		System.out.println("DepositDeposit: "+transactions);
 		return deposit;
 	}
 
 	public void closeTransaction(Transaction transaction) {
-		totalBalance = totalBalance.add(transaction.getDirectionalPayload());
-		transactions.remove(transaction);
+		currentBalance = currentBalance.add(transaction.getDirectionalPayload());
+		//transactions.remove(transaction);
 	}
 
 	Account(AggregateId aggregateId, CustomerData customerData) {
@@ -67,9 +89,8 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 	@OrderColumn(name = "itemNumber")
 	private Set<Transaction> transactions = new HashSet<Transaction>();
 
-	public Set<Transaction> getTransactions() {
-		System.out.println("transactionstransactions: "+transactions);
-		return Collections.unmodifiableSet(transactions);
+	public List<Transaction> getTransactions() {
+		return Collections.unmodifiableList(new ArrayList<Transaction>(transactions));
 	}
 
 	public void createTransaction(Transaction transaction) {
@@ -80,7 +101,7 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 		transactions.remove(transaction);
 	}
 
-	private Money totalBalance = new Money(new BigDecimal(0));
+	private Money currentBalance = new Money(new BigDecimal(0));
 
 	public Money getTotalBalance() {
 		Money additionalBalance = new Money(0);
@@ -88,7 +109,7 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 			additionalBalance = additionalBalance.add(transaction
 					.getProcessedPayload());
 		}
-		return totalBalance.add(additionalBalance);
+		return currentBalance.add(additionalBalance);
 	}
 
 	public Money getAvailableBalance() {
@@ -118,12 +139,18 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 		if (!canAfford(amount)) {
 			domainError("Can not afford: " + amount);
 		}
-		totalBalance = totalBalance.subtract(amount);
+		currentBalance = currentBalance.subtract(amount);
 		return paymentFactory.createPayment(this.customerData, amount);
 	}
-
+	public void income(Money amount){
+		Income create = incomeFactory.create(this, amount);
+		create.confirm();
+	}
+	public Outgo outgo(Transaction transaction,Money amount){
+		return outgoFactory.create(this,transaction, amount);
+	}
 	public boolean canAfford(Money amount) {
-		return this.getAvailableBalance().greaterThan(amount);
+		return !this.getAvailableBalance().lessThan(amount);
 	}
 
 	public void register(Customer customer) {
