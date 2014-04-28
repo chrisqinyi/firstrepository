@@ -8,19 +8,25 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import pl.com.bottega.ddd.support.domain.BaseEntity;
+import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.AggregateId;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 
+import com.beeInvestment.account.domain.Account;
+import com.beeInvestment.transaction.domain.Transaction;
+import com.beeInvestment.transaction.domain.TransactionDirection;
+
 @Entity
-public class Reward extends BaseEntity {
+public class Reward extends Transaction {
 	private Reward() {
 	}
-
-	Reward(BigDecimal periodIndex, Money reward, Investment investment) {
+	public void transferTo(Account account) {
+		this.account = account;
+	}
+	Reward(AggregateId transactionId,BigDecimal periodIndex, Money reward, Investment investment) {
+		super(transactionId,investment.getAccount(),reward,TransactionDirection.INCOME);
 		this.target = investment.getTarget();
 		this.investment = investment;
 		this.periodIndex = periodIndex;
-		this.reward = reward;
 	}
 
 	public BigDecimal getPeriodIndex() {
@@ -28,7 +34,7 @@ public class Reward extends BaseEntity {
 	}
 
 	public Money getReward() {
-		return reward;
+		return this.payload;
 	}
 
 	private BigDecimal periodIndex;
@@ -38,10 +44,13 @@ public class Reward extends BaseEntity {
 	@ManyToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "investment_id")
 	private Investment investment;
-	@Embedded
-	private Money reward;
-	private boolean fulfilled=false;
+
 	public void fulfill() {
-		fulfilled=true;
+		investment.reward(this);
+	}
+	@Override
+	public void process() {
+		// TODO Auto-generated method stub
+		
 	}
 }

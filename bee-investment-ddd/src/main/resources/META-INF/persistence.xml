@@ -31,6 +31,8 @@
 		<class>com.beeInvestment.investment.domain.Target</class>
 		<class>com.beeInvestment.investment.domain.Investment</class>
 		<class>com.beeInvestment.investment.domain.Reward</class>
+		<class>com.beeInvestment.account.domain.Deposit</class>
+		<class>com.beeInvestment.account.domain.Withdraw</class>
 		<properties>
 			<property name="hibernate.hbm2ddl.auto" value="create" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>

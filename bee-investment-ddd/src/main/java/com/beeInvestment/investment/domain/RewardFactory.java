@@ -15,7 +15,8 @@ public class RewardFactory {
 	@Inject
 	private AutowireCapableBeanFactory spring;
 	public Reward create(BigDecimal periodIndex, Money rewardFund,Investment investment){
-		Reward reward = new Reward(periodIndex, rewardFund, investment);
+		AggregateId aggregateId=AggregateId.generate();
+		Reward reward = new Reward(aggregateId,periodIndex, rewardFund, investment);
 		spring.autowireBean(reward);
 		return reward;
 	}

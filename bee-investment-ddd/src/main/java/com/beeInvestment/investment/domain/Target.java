@@ -2,7 +2,6 @@ package com.beeInvestment.investment.domain;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +20,10 @@ import org.hibernate.annotations.FetchMode;
 
 import pl.com.bottega.ddd.support.domain.BaseAggregateRoot;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.AggregateId;
-import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.CustomerData;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 
+import com.beeInvestment.account.domain.Account;
+import com.beeInvestment.application.InvestEvent;
 import com.beeInvestment.application.LoadTargetEvent;
 
 @Entity
@@ -35,12 +35,13 @@ public class Target extends BaseAggregateRoot {
 	private Target() {
 	}
 
-	Target(AggregateId aggregateId, Money totalFund,BigDecimal interestRate, BigDecimal periods) {
+	Target(AggregateId aggregateId, Money totalFund, BigDecimal interestRate,
+			BigDecimal periods) {
 		this.aggregateId = aggregateId;
 		this.totalFund = totalFund;
 		this.periods = periods;
-		this.remainingPeriods=periods;
-		this.interestRate=interestRate;
+		// this.remainingPeriods=periods;
+		this.interestRate = interestRate;
 	}
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "target")
@@ -51,10 +52,10 @@ public class Target extends BaseAggregateRoot {
 	@Fetch(FetchMode.JOIN)
 	@OrderColumn(name = "itemNumber")
 	private Set<Reward> rewards = new HashSet<Reward>();
-	private BigDecimal remainingPeriods;
-	public BigDecimal getRemainingPeriods() {
-		return remainingPeriods;
-	}
+	// private BigDecimal remainingPeriods;
+	// public BigDecimal getRemainingPeriods() {
+	// return remainingPeriods;
+	// }
 
 	private BigDecimal periods;
 
@@ -70,7 +71,7 @@ public class Target extends BaseAggregateRoot {
 	}
 
 	private BigDecimal interestRate;
-	
+
 	public Money getRemainingFund() {
 		Money investedFund = new Money(0);
 		for (Investment investment : investments) {
@@ -96,32 +97,36 @@ public class Target extends BaseAggregateRoot {
 	}
 
 	public void reward(BigDecimal periodIndex) {
+		List tmp = new ArrayList<Reward>();
 		for (Reward reward : rewards) {
 			if (reward.getPeriodIndex().intValue() == periodIndex.intValue()) {
 				reward.fulfill();
+				// rewards.remove(reward);
+				tmp.add(reward);
 			}
 		}
-		remainingPeriods=remainingPeriods.subtract(new BigDecimal(1));
+		rewards.removeAll(tmp);
+		// remainingPeriods=remainingPeriods.subtract(new BigDecimal(1));
 	}
 
-	public void transfer(CustomerData customerData, BigDecimal InvestmentIndex) {
+	public void transfer(Account account, BigDecimal InvestmentIndex) {
 		Investment investment = new ArrayList<Investment>(investments)
 				.get(InvestmentIndex.intValue());
-		Investment create = investmentFactory.create(this, customerData,
-				investment.getFund(), investment);
-		Set<Reward> calculateRewards = investment.calculateRewards();
-		investments.add(create);
-		investments.remove(investment);
-		rewards.removeAll(investment.getRewards());
-		rewards.addAll(calculateRewards);
+		investment.transferTo(account);
+		// Investment create = investmentFactory.create(this, customerData,
+		// investment.getFund(), investment);
+		// Set<Reward> calculateRewards = investment.calculateRewards();
+		// investments.add(create);
+		// investments.remove(investment);
+		// rewards.removeAll(investment.getRewards());
+		// rewards.addAll(calculateRewards);
 		// this.investments.toArray().
 		// List<Object> asList = Arrays.asList(this.investments);
 
 	}
 
-	public void invest(CustomerData customerData, Money fund) {
-		Investment investment = investmentFactory.create(this, customerData,
-				fund, null);
+	public void invest(Account account, Money fund) {
+		Investment investment = investmentFactory.create(this, account, fund);
 		if (fund.lessThan(new Money(new BigDecimal(100)))) {
 			throw new RuntimeException(
 					"investment fund cannot be less than 100.00");
@@ -141,5 +146,7 @@ public class Target extends BaseAggregateRoot {
 					"remaining investment fund cannot be less than 100.00");
 		}
 		investments.add(investment);
+		eventPublisher.publish(new InvestEvent());
+
 	}
 }

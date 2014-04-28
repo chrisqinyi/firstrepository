@@ -24,28 +24,36 @@ import org.springframework.stereotype.Component;
 
 import pl.com.bottega.cqrs.command.handler.CommandHandler;
 
+import com.beeInvestment.transaction.domain.Transaction;
+
 /**
  * @author Slawek
  */
 @Component
 public class RunEnvironment {
 
-	public interface HandlersProvider{
+	public interface HandlersProvider {
 		CommandHandler<Object, Object> getHandler(Object command);
 	}
-	
+
 	@Inject
 	private HandlersProvider handlersProfiver;
-	
-	public Object run(Object command) {		
-		CommandHandler<Object, Object> handler = handlersProfiver.getHandler(command);
-		
-		//You can add Your own capabilities here: dependency injection, security, transaction management, logging, profiling, spying, storing commands, etc
-		
-		Object result = handler.handle(command);
 
-		//You can add Your own capabilities here
-		
+	public Object run(Object command) {
+		CommandHandler<Object, Object> handler = handlersProfiver
+				.getHandler(command);
+
+		// You can add Your own capabilities here: dependency injection,
+		// security, transaction management, logging, profiling, spying, storing
+		// commands, etc
+
+		Object result = handler.handle(command);
+//		if (result instanceof Transaction) {
+//			System.out.println("RunEnvironment process");
+//			((Transaction)result).process();
+//		}
+		// You can add Your own capabilities here
+
 		return result;
 	}
 

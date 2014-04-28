@@ -17,12 +17,10 @@ package pl.com.bottega.ddd.support.infrastructure.repository.jpa;
 
 import java.lang.reflect.ParameterizedType;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +66,7 @@ public abstract class GenericJpaRepository<A extends BaseAggregateRoot> {
     	if (entityManager.contains(aggregate)){
     		//locking Aggregate Root logically protects whole aggregate
     		entityManager.lock(aggregate, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//    		entityManager.merge(aggregate);
     	}
     	else{
     	    entityManager.persist(aggregate);
@@ -77,6 +76,8 @@ public abstract class GenericJpaRepository<A extends BaseAggregateRoot> {
     public void delete(AggregateId id){
 		A entity = load(id);
 		//just flag
-		entity.markAsRemoved();					
+		//entity.markAsRemoved();			
+		entityManager.remove(entity);
 	}
+    
 }

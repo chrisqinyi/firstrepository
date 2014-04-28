@@ -26,5 +26,7 @@ public class HibernateListenersConfigurer {
                 EventListenerRegistry.class);
         registry.getEventListenerGroup(EventType.POST_LOAD).appendListener(listener);
         registry.getEventListenerGroup(EventType.MERGE).appendListener(listener);
+        registry.getEventListenerGroup(EventType.POST_INSERT).appendListener(listener);
+        registry.getEventListenerGroup(EventType.POST_UPDATE).appendListener(listener);
     }
 }

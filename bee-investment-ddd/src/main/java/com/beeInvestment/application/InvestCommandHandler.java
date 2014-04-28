@@ -7,23 +7,42 @@ import pl.com.bottega.cqrs.command.handler.CommandHandler;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.AggregateId;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 
+import com.beeInvestment.account.domain.Account;
 import com.beeInvestment.account.domain.AccountRepository;
+import com.beeInvestment.customer.domain.Customer;
 import com.beeInvestment.customer.domain.CustomerRepository;
 import com.beeInvestment.investment.domain.Target;
 import com.beeInvestment.investment.domain.TargetRepository;
+import com.beeInvestment.payment.domain.Payment;
+import com.beeInvestment.payment.domain.PaymentRepository;
+
 @CommandHandlerAnnotation
-public class InvestCommandHandler implements CommandHandler<InvestCommand, Void> {
+public class InvestCommandHandler implements
+		CommandHandler<InvestCommand, Void> {
 	@Inject
 	private TargetRepository targetRepository;
 	@Inject
 	private CustomerRepository customerRepository;
 	@Inject
 	private AccountRepository accountRepository;
+//	@Inject
+	private PaymentRepository paymentRepository;
 	@Override
 	public Void handle(InvestCommand command) {
+		Target target = targetRepository.load(new AggregateId(command
+				.getTargetId()));
+		AggregateId customerId = new AggregateId(command.getCustomerId());
+		//Customer customer = customerRepository.load(customerId);
+		Account account=accountRepository.load(customerId);
 		
-		Target target=targetRepository.load(new AggregateId(command.getTargetId()));
-		target.invest(customerRepository.load(new AggregateId(command.getCustomerId())).generateSnapshot(),new Money(command.getFund()));
+		
+//		Account account=accountRepository.load(customerId);
+		if (! account.canAfford(new Money(command.getFund())))
+			throw new RuntimeException("customer has insufficent money");
+//		Payment payment = account.charge(new Money(command.getFund()));
+//		paymentRepository.save(payment);
+		target.invest(account, new Money(command.getFund()));
+		accountRepository.save(account);
 		targetRepository.save(target);
 		return null;
 	}
