@@ -8,7 +8,7 @@
 
 	<name>Bee Investment Web</name>
 	<packaging>war</packaging>
-
+ 
 	<properties>
 
 		<!-- Generic properties -->
