@@ -59,6 +59,20 @@ public class Constant {
     public static final String HTML_CSS_FEATURES_PATH = HTML_CSS_PATH + FEATURES_PATH + "/";
     public static final String HTML_CSS_BASE_PATH = HTML_CSS_PATH + BASE_PATH + "/";
 
+    public static final String DEV_TEST_FLAG = "DEV_TEST_FLAG";
+    public static final String TEST_PATH = "/test";
+    public static String TEST_SRC_PATH = "/src/test/resources/client";
+    public static String TEST_SRC_BOARD_PATH;
+    public static String TEST_SRC_CSS_PATH;
+    public static String TEST_SRC_JS_PATH;
+    public static String TEST_SRC_MOCK_PATH;
+    public static String TEST_SRC_QUNIT_PATH;
+    public static String TEST_OUT_CSS_PATH;
+    public static String TEST_OUT_JS_PATH;
+    public static String TEST_OUT_MOCK_PATH;
+    public static String TEST_OUT_QUNIT_PATH;
+    public static String TEST_OUT_PATH;
+
     static {
         String base = System.getProperty("user.dir");
         IO_SRC_PATH = convertFileSeparator(base + IO_SRC_PATH);
@@ -87,6 +101,19 @@ public class Constant {
         IO_OUT_CSS_LIB_PATH = convertFileSeparator(IO_OUT_CSS_PATH + LIB_PATH);
         IO_OUT_CSS_FEATURES_PATH = convertFileSeparator(IO_OUT_CSS_PATH + FEATURES_PATH);
         IO_OUT_CSS_BASE_PATH = convertFileSeparator(IO_OUT_CSS_PATH + BASE_PATH);
+
+        TEST_SRC_PATH = convertFileSeparator(base + TEST_SRC_PATH);
+        TEST_SRC_BOARD_PATH = convertFileSeparator(TEST_SRC_PATH + "/board");
+        TEST_SRC_CSS_PATH = convertFileSeparator(TEST_SRC_PATH + "/css");
+        TEST_SRC_JS_PATH = convertFileSeparator(TEST_SRC_PATH + "/js");
+        TEST_SRC_MOCK_PATH = convertFileSeparator(TEST_SRC_PATH + "/mock");
+        TEST_SRC_QUNIT_PATH = convertFileSeparator(TEST_SRC_PATH + "/qunit");
+        TEST_OUT_CSS_PATH = convertFileSeparator(IO_OUT_PATH + TEST_PATH + "/css");
+        TEST_OUT_JS_PATH = convertFileSeparator(IO_OUT_PATH + TEST_PATH + "/js");
+        TEST_OUT_MOCK_PATH = convertFileSeparator(IO_OUT_PATH + TEST_PATH + "/mock");
+        TEST_OUT_QUNIT_PATH = convertFileSeparator(IO_OUT_PATH + TEST_PATH + "/qunit");
+        TEST_OUT_PATH = convertFileSeparator(IO_OUT_PATH + TEST_PATH);
+
     }
 
     private static String convertFileSeparator(String path) {
