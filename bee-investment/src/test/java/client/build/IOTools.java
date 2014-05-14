@@ -130,7 +130,7 @@ public class IOTools {
 
             @Override
             public boolean accept(File dir, String name) {
-                if (filePath.indexOf("js") > -1) {
+                if (filePath.indexOf("js") > -1 || name.endsWith(".js")) {
                     return name.endsWith(".js") || name.endsWith(".JS");
                 } else {
                     return name.endsWith(".css") || name.endsWith(".CSS");
@@ -138,7 +138,7 @@ public class IOTools {
             }
         });
         if (pathFiles.length > 0) {
-            if (filePath.indexOf("js") > -1) {
+            if (filePath.indexOf("js") > -1 || pathFiles[0].getName().endsWith(".js")) {
                 for (File subFile : pathFiles) {
                     sb.append(buildJSLink(htmlPath + IOTools.getOutputFileName(subFile.getPath())) + IOTools.BREAK_LINE);
                 }
@@ -160,7 +160,7 @@ public class IOTools {
 
             @Override
             public boolean accept(File dir, String name) {
-                if (filePath.indexOf("js") > -1) {
+                if (name.indexOf("js") > -1) {
                     return name.equalsIgnoreCase(featureName + ".js") || name.equalsIgnoreCase(featureName + ".JS");
                 } else {
                     return name.equalsIgnoreCase(featureName + ".css") || name.equalsIgnoreCase(featureName + ".CSS");
@@ -169,7 +169,7 @@ public class IOTools {
         });
 
         if (pathFiles.length > 0) {
-            if (filePath.indexOf("js") > -1) {
+            if (pathFiles[0].getName().indexOf("js") > -1) {
                 outStr = buildJSLink(htmlPath + featureName + ".js") + IOTools.BREAK_LINE;
             } else {
                 outStr = buildCSSLink(htmlPath + featureName + ".css") + IOTools.BREAK_LINE;
@@ -220,4 +220,3 @@ public class IOTools {
     }
 
 }
-

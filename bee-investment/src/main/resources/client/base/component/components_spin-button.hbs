@@ -1,0 +1,7 @@
+<button {{bind-attr id=id}} {{action 'showLoading'}}>
+	{{#if isLoading}} 
+		<img src="../css/lib/images/animated-overlay.gif" alt="Loading" height="12pt" width="12pt"> {{buttonText}}
+	{{else}} 
+		{{buttonText}}
+	{{/if}}
+</button>

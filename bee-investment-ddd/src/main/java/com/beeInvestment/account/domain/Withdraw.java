@@ -8,7 +8,6 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 import com.beeInvestment.transaction.domain.Transaction;
 import com.beeInvestment.transaction.domain.TransactionDirection;
 import com.beeInvestment.transaction.domain.TransactionStatus;
-
 @Entity
 public class Withdraw extends Transaction {
 	private Withdraw() {
