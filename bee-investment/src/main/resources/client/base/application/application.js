@@ -12,12 +12,3 @@ App.ResetScroll = Em.Mixin.create({
     }
 });
 
-App.ApplicationRoute = Em.Route.extend(App.ResetScroll, {
-    activate : function() {
-        this._super.apply(this, arguments);
-    }
-});
-
-Em.RSVP.configure('onerror', function(error) {
-    Em.Logger.assert(false, error);
-});
