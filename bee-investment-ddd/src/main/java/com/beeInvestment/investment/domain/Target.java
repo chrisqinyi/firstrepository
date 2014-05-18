@@ -1,8 +1,17 @@
 package com.beeInvestment.investment.domain;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.FluentIterable.from;
+import static com.google.common.collect.Iterables.all;
+import static pl.com.bottega.ecommerce.system.Functions.property;
+import static pl.com.bottega.ecommerce.system.Predicates.invoke;
+import static pl.com.bottega.ecommerce.system.Predicates.propertyNotEquals;
+import static pl.com.bottega.ecommerce.system.Reduce.reduce;
+import static pl.com.bottega.ecommerce.system.ReduceFunctions.sum;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +24,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
@@ -28,21 +36,16 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 import com.beeInvestment.account.domain.Account;
 import com.beeInvestment.application.InvestEvent;
 import com.beeInvestment.application.LoadTargetEvent;
-import com.beeInvestment.transaction.domain.Transaction;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Sets;
+import com.beeInvestment.transaction.domain.TransactionStatus;
+import com.google.common.collect.FluentIterable;
 
 @Entity
 public class Target extends BaseAggregateRoot {
 
 	public TargetStatus getStatus() {
-		if (status.equals(TargetStatus.OFFERRING)
-				&& getRemainingFund().equals(new Money(new BigDecimal(0)))) {
-			status = TargetStatus.WAITING_APPROVAL;
-		}
 		return status;
 	}
-
+	private Date publishDate=null;
 	@Access(value = AccessType.PROPERTY)
 	private TargetStatus status = TargetStatus.NEW;
 
@@ -54,9 +57,6 @@ public class Target extends BaseAggregateRoot {
 	}
 
 	public Set<Investment> getInvestments() {
-		// ArrayList<Investment> list = new ArrayList<Investment>(investments);
-		// List unmodifiableList = Collections.unmodifiableList(list);
-		// Collections.sort(list);
 		return investments;
 	}
 
@@ -65,33 +65,23 @@ public class Target extends BaseAggregateRoot {
 		this.aggregateId = aggregateId;
 		this.totalFund = totalFund;
 		this.periods = periods;
-		// this.remainingPeriods=periods;
 		this.interestRate = interestRate;
 	}
-
-	private void setInvestments(Set<Investment> investments) {
-		final Target target = this;
-		this.investments = investments;
-		// System.out.println("getRemainingFund():"+getRemainingFund());
-		// if(status.equals(TargetStatus.OFFERRING)&&getRemainingFund().equals(new
-		// Money(new BigDecimal(0)))){
-		// status=TargetStatus.WAITING_APPROVAL;
-		// }
-	}
-
-	@Access(value = AccessType.PROPERTY)
+	@Access(value=AccessType.PROPERTY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "target")
 	@Fetch(FetchMode.JOIN)
 	@OrderBy(value = "generateTimeStamp")
 	private Set<Investment> investments = new HashSet<Investment>();
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "target")
-	@Fetch(FetchMode.JOIN)
-	@OrderColumn(name = "itemNumber")
-	private Set<Reward> rewards = new HashSet<Reward>();
-	// private BigDecimal remainingPeriods;
-	// public BigDecimal getRemainingPeriods() {
-	// return remainingPeriods;
-	// }
+
+	private void setInvestments(Set<Investment> investments) {
+		this.investments = investments;
+		this.outstandingInvestments=from(investments).filter(propertyNotEquals("status",TransactionStatus.SUCCESS));
+	}
+	@Transient
+	private FluentIterable<Investment> outstandingInvestments;
+	public FluentIterable<Investment> getOutstandingInvestments() {
+		return outstandingInvestments;
+	}
 
 	private BigDecimal periods;
 
@@ -109,11 +99,9 @@ public class Target extends BaseAggregateRoot {
 	private BigDecimal interestRate;
 
 	public Money getRemainingFund() {
-		Money investedFund = new Money(0);
-		for (Investment investment : investments) {
-			investedFund = investedFund.add(investment.getFund());
-		}
-		return totalFund.subtract(investedFund);
+		return totalFund.subtract(reduce(
+				from(investments).transform(property("payload", Money.class)),
+				sum()));
 	};
 
 	public void load() {
@@ -122,70 +110,74 @@ public class Target extends BaseAggregateRoot {
 	}
 
 	public void publish() {
-		if (!status.equals(TargetStatus.NEW)) {
-			throw new RuntimeException(
-					"Targets can only be published in new status");
-		}
+		checkArgument(getStatus().equals(TargetStatus.NEW),
+				"Targets can only be published in new status");
 		status = TargetStatus.OFFERRING;
+		publishDate=new Date();
 	}
 
 	public void approve() {
-		if (!getStatus().equals(TargetStatus.WAITING_APPROVAL)) {
-			throw new RuntimeException(
-					"Targets can only be approved in waiting approval status");
-		}
-		//Collection<Transaction> rewards=new ArrayList<Transaction>();
-		for (Investment investment : investments) {
-			//Collection<Reward> calculateRewards = investment.calculateRewards();
-			investment.confirm();
-			investment.process();
-			//rewards.addAll(calculateRewards);
-		}
+		checkArgument(getStatus().equals(TargetStatus.WAITING_APPROVAL),
+				"Targets can only be approved in waiting approval status");
+		all(investments,invoke("approve"));
 		status = TargetStatus.REWARDING;
+		
 	}
 
+	public void cancel(){
+		checkArgument(status.equals(TargetStatus.OFFERRING),
+				"Targets can only get cancelled in offerring status");
+		checkArgument(investments.isEmpty(),
+				"Targets can only get cancelled when there is no investment");
+		this.status=TargetStatus.NEW;
+	}
+	
+	public void timeout(){
+		checkArgument(status.equals(TargetStatus.OFFERRING),
+				"Targets can only get time out in offerring status");
+		all(investments,invoke("cancel"));
+		investments.clear();
+		this.status=TargetStatus.NEW;
+	}
+	
 	public void transferInvestment(Integer investmentIndex, Account account) {
 		new ArrayList<Investment>(investments).get(investmentIndex).transferTo(
 				account);
 	}
 
 	public void reward(BigDecimal periodIndex) {
-		if (!status.equals(TargetStatus.REWARDING)) {
-			throw new RuntimeException(
-					"Rewards can only be processed with target in rewarding status");
-		}
-		for (Investment investment : investments) {
-			investment.reward(periodIndex);
+		System.out.println("status:status:status:status:status:status:status:status:"+status);
+		//if(1==1)throw new RuntimeException();
+		checkArgument(status.equals(TargetStatus.REWARDING),
+				"Rewards can only be processed with target in rewarding status");
+		all(investments, invoke("reward", periodIndex));
+		if(outstandingInvestments.isEmpty()){
+			this.status=TargetStatus.SUCCESS;
 		}
 	}
 
 	public Investment invest(Account account, Money fund) {
-		if (status.equals(TargetStatus.WAITING_APPROVAL)) {
-			throw new RuntimeException("target full");
-		}
-		if (!status.equals(TargetStatus.OFFERRING)) {
-			throw new RuntimeException(
-					"Targets can only be invested in offerring status");
-		}
+		checkArgument(!getStatus().equals(TargetStatus.WAITING_APPROVAL),
+				"target full");
+		checkArgument(status.equals(TargetStatus.OFFERRING),
+				"Targets can only be invested in offerring status");
 		Investment investment = investmentFactory.create(this, account, fund);
-		if (fund.lessThan(new Money(new BigDecimal(100)))) {
-			throw new RuntimeException(
-					"investment fund cannot be less than 100.00");
-		}
+		checkArgument(!fund.lessThan(new Money(100)),
+				"investment fund cannot be less than 100.00");
 		Money remainingFund = getRemainingFund();
-		if (remainingFund.lessThan(fund)) {
-			throw new RuntimeException("no enough remaining investment fund");
-		}
+		checkArgument(!remainingFund.lessThan(fund),
+				"no enough remaining investment fund");
 		Money subtract = remainingFund.subtract(fund);
-		System.out.println("subtract:" + subtract);
-		if (subtract.greaterThan(new Money(new BigDecimal(0)))
-				&& subtract.lessThan(new Money(new BigDecimal(100)))) {
-			throw new RuntimeException(
-					"remaining investment fund cannot be less than 100.00");
-		}
+		checkArgument(
+				!(subtract.greaterThan(Money.ZERO) && subtract
+						.lessThan(new Money(100))),
+				"remaining investment fund cannot be less than 100.00");
 		investments.add(investment);
 		eventPublisher.publish(new InvestEvent());
-
+		if (status.equals(TargetStatus.OFFERRING)
+				&& getRemainingFund().equals(Money.ZERO)) {
+			status = TargetStatus.WAITING_APPROVAL;
+		}
 		return investment;
 	}
 
@@ -193,7 +185,4 @@ public class Target extends BaseAggregateRoot {
 		this.status = status;
 	}
 
-	public Set<Reward> getRewards() {
-		return rewards;
-	}
 }

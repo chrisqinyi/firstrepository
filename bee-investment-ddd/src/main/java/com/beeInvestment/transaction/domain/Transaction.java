@@ -1,5 +1,6 @@
 package com.beeInvestment.transaction.domain;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -29,13 +31,13 @@ import com.beeInvestment.account.domain.Account;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Transaction extends BaseAggregateRoot implements Comparable<Transaction>{
-	@Access(value = AccessType.PROPERTY)
+	@Access(value=AccessType.PROPERTY)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parent")
 	@Fetch(FetchMode.JOIN)
 	@OrderBy(value = "generateTimeStamp")
 	protected Set<Transaction> transactions=new HashSet<Transaction>();
-	
-	protected Set<Transaction> getTransactions() {
+
+	private Set<Transaction> getTransactions() {
 		return transactions;
 	}
 
@@ -134,6 +136,7 @@ public abstract class Transaction extends BaseAggregateRoot implements Comparabl
 	public void cancel() {
 		account.cancelTransaction(this);
 		account = null;
+		this.status=TransactionStatus.FAILED;
 	}
 
 	public void close() {
@@ -148,6 +151,20 @@ public abstract class Transaction extends BaseAggregateRoot implements Comparabl
 		//parent=null;
 		// this.eventPublisher.publish(new
 		// TransactionConfirmedEvent(this.aggregateId.getId()));
+	}
+
+	@Override
+	public String toString() {
+		String string=super.toString();
+		try {
+			string = BeanUtils.describe(this).toString();
+		} catch (IllegalAccessException | InvocationTargetException
+				| NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException();
+		}
+		return string;
 	}
 
 }

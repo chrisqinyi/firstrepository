@@ -1,5 +1,13 @@
 package com.beeInvestment.account.domain;
-
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.or;
+import static com.google.common.collect.FluentIterable.from;
+import static com.google.common.collect.Iterables.all;
+import static pl.com.bottega.ecommerce.system.Functions.property;
+import static pl.com.bottega.ecommerce.system.Predicates.*;
+import static pl.com.bottega.ecommerce.system.Reduce.reduce;
+import static pl.com.bottega.ecommerce.system.ReduceFunctions.sum;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +21,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
+import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
@@ -60,12 +68,8 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 		return frozen;
 	}
 	public Withdraw withdraw(Money amount){
-		if(frozen){
-			domainError("Account frozen!");
-		}
-		if (!canAfford(amount)) {
-			domainError("Can not afford: " + amount);
-		}
+		checkArgument(!frozen,"Account frozen!");
+		checkArgument(canAfford(amount),"Can not afford: " + amount);
 		Withdraw withdraw = withdrawFactory.create(this, amount);
 		return withdraw;
 	}
@@ -76,7 +80,6 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 
 	public void closeTransaction(Transaction transaction) {
 		currentBalance = currentBalance.add(transaction.getDirectionalPayload());
-		//transactions.remove(transaction);
 	}
 
 	Account(AggregateId aggregateId, CustomerData customerData) {
@@ -86,7 +89,7 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "account")
 	@Fetch(FetchMode.JOIN)
-	@OrderColumn(name = "itemNumber")
+	@OrderBy(value = "generateTimeStamp")
 	private Set<Transaction> transactions = new HashSet<Transaction>();
 
 	public List<Transaction> getTransactions() {
@@ -101,29 +104,14 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 		transactions.remove(transaction);
 	}
 
-	private Money currentBalance = new Money(new BigDecimal(0));
+	private Money currentBalance = Money.ZERO;
 
 	public Money getTotalBalance() {
-		Money additionalBalance = new Money(0);
-		for (Transaction transaction : transactions) {
-			additionalBalance = additionalBalance.add(transaction
-					.getProcessedPayload());
-		}
-		return currentBalance.add(additionalBalance);
+		return currentBalance.add(reduce(from(transactions).transform(property("processedPayload",Money.class)),sum()));
 	}
 
 	public Money getAvailableBalance() {
-		Money frozenBalance = new Money(0);
-		for (Transaction transaction : transactions) {
-			if (transaction.getDirection().equals(TransactionDirection.INCOME)) {
-				continue;
-			}
-			if (transaction.getStatus().equals(TransactionStatus.SUCCESS)) {
-				continue;
-			}
-			frozenBalance = frozenBalance.add(transaction.getPayload());
-		}
-		return getTotalBalance().subtract(frozenBalance);
+		return getTotalBalance().subtract(reduce(from(transactions).filter(and(propertyNotEquals("direction",TransactionDirection.INCOME),propertyNotEquals("status",TransactionStatus.SUCCESS))).transform(property("payload",Money.class)),sum()));
 	}
 
 	/**
@@ -136,9 +124,7 @@ public class Account extends BaseAggregateRoot implements TransactionHolder {
 	 * @return
 	 */
 	public Payment charge(Money amount) {
-		if (!canAfford(amount)) {
-			domainError("Can not afford: " + amount);
-		}
+		checkArgument(canAfford(amount),"Can not afford: " + amount);
 		currentBalance = currentBalance.subtract(amount);
 		return paymentFactory.createPayment(this.customerData, amount);
 	}

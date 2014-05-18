@@ -1,6 +1,18 @@
 package com.beeInvestment.ddd;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
+
+import java.math.BigDecimal;
+
 import org.junit.Test;
+
+import pl.com.bottega.ecommerce.sharedkernel.Money;
+
+import com.beeInvestment.application.ApproveTargetCommand;
+import com.beeInvestment.application.InvestCommand;
+import com.beeInvestment.application.PublishTargetCommand;
+import com.beeInvestment.investment.domain.TargetStatus;
 
 public class InvestmentTests extends BaseTestCase {
 	
@@ -50,12 +62,50 @@ public class InvestmentTests extends BaseTestCase {
 	 * 6.5) User logout.
 	*/
 	public void makeInvetmentTest() {
-//		customer.getTargetList(null);
-//		Target target = null;
-//		
-//		Investment investment = customer.invest(target);
-
+		gate.dispatch(new PublishTargetCommand(target1.getAggregateId().getId()));
+		gate.dispatch(new PublishTargetCommand(target2.getAggregateId().getId()));
+		gate.dispatch(new InvestCommand(target1.getAggregateId().getId(),customerA.getAggregateId().getId(),new BigDecimal(5000)));
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(new BigDecimal(25000))));
+		assertThat(getAccountA().getTotalBalance(),equalTo(new Money(new BigDecimal(30000))));
+		transactionService.processTransaction();
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(new BigDecimal(25000))));
+		assertThat(getAccountA().getTotalBalance(),equalTo(new Money(new BigDecimal(30000))));
+		gate.dispatch(new InvestCommand(target2.getAggregateId().getId(),customerA.getAggregateId().getId(),new BigDecimal(8000)));
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(new BigDecimal(17000))));
+		assertThat(getAccountA().getTotalBalance(),equalTo(new Money(new BigDecimal(30000))));
+		transactionService.processTransaction();
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(new BigDecimal(17000))));
+		assertThat(getAccountA().getTotalBalance(),equalTo(new Money(new BigDecimal(30000))));
+		
+		gate.dispatch(new InvestCommand(target1.getAggregateId().getId(),customerB.getAggregateId().getId(),new BigDecimal(5000)));
+		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(new BigDecimal(45000))));
+		assertThat(getAccountB().getTotalBalance(),equalTo(new Money(new BigDecimal(50000))));
+		transactionService.processTransaction();
+		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(new BigDecimal(45000))));
+		assertThat(getAccountB().getTotalBalance(),equalTo(new Money(new BigDecimal(50000))));
+		gate.dispatch(new InvestCommand(target2.getAggregateId().getId(),customerB.getAggregateId().getId(),new BigDecimal(7000)));
+		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(new BigDecimal(38000))));
+		assertThat(getAccountB().getTotalBalance(),equalTo(new Money(new BigDecimal(50000))));
+		transactionService.processTransaction();
+		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(new BigDecimal(38000))));
+		assertThat(getAccountB().getTotalBalance(),equalTo(new Money(new BigDecimal(50000))));
+		assertThat(getTarget1().getStatus(),equalTo(TargetStatus.WAITING_APPROVAL));
+		assertThat(getTarget2().getStatus(),equalTo(TargetStatus.OFFERRING));
+		gate.dispatch(new ApproveTargetCommand(target1.getAggregateId().getId()));
+		assertThat(getAccountA().getTotalBalance(),equalTo(new Money(new BigDecimal(25000))));
+		assertThat(getAccountB().getTotalBalance(),equalTo(new Money(new BigDecimal(45000))));
+		assertThat(getTarget1().getStatus(),equalTo(TargetStatus.REWARDING));
+		assertThat(getTarget1().getOutstandingInvestments().size(),equalTo(2));
+		assertThat(getTarget1().getOutstandingInvestments().get(0).getOutstandingRewards().size(),equalTo(2));
+		assertThat(getTarget1().getOutstandingInvestments().get(1).getOutstandingRewards().size(),equalTo(2));
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(new BigDecimal(17000))));
+		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(new BigDecimal(38000))));
+		targetService.targetTimeout();
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(new BigDecimal(25000))));
+		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(new BigDecimal(45000))));
 	}
+		
+	
 
 
 

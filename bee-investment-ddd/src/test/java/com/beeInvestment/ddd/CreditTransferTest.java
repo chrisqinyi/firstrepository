@@ -1,10 +1,15 @@
 package com.beeInvestment.ddd;
-
+import static com.google.common.collect.FluentIterable.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static pl.com.bottega.ecommerce.system.Functions.property;
+import static pl.com.bottega.ecommerce.system.Reduce.reduce;
+import static pl.com.bottega.ecommerce.system.ReduceFunctions.sum;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import org.junit.Test;
 
@@ -17,6 +22,8 @@ import com.beeInvestment.application.RewardCommand;
 import com.beeInvestment.application.TransferCommand;
 import com.beeInvestment.investment.domain.Investment;
 import com.beeInvestment.investment.domain.TargetStatus;
+import com.beeInvestment.transaction.domain.TransactionStatus;
+import com.google.common.collect.Lists;
 
 public class CreditTransferTest extends BaseTestCase{
 	
@@ -72,7 +79,6 @@ public class CreditTransferTest extends BaseTestCase{
 	 *
 	 */
 	
-	
 	public void creditTransferTest() {
 		gate.dispatch(new PublishTargetCommand(target2.getAggregateId().getId()));
 		gate.dispatch(new InvestCommand(target2.getAggregateId().getId(),customerA.getAggregateId().getId(),new BigDecimal(20000)));
@@ -92,10 +98,10 @@ public class CreditTransferTest extends BaseTestCase{
 		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(new BigDecimal(20000))));
 		assertThat(getAccountB().getTotalBalance(),equalTo(new Money(new BigDecimal(20000))));
 		assertThat(getTarget2().getStatus(),equalTo(TargetStatus.REWARDING));
-		assertThat(getTarget2().getRewards().size(),equalTo(6));
+		//assertThat(getTarget2().getRewards().size(),equalTo(6));
 		assertThat(getTarget2().getInvestments().size(),equalTo(2));
 		gate.dispatch(new TransferCommand(target2.getAggregateId().getId(),new BigDecimal(0),customerB.getAggregateId().getId()));
-		//transactionService.processTransaction();
+		transactionService.processTransaction();
 		assertThat(new ArrayList<Investment>(getTarget2().getInvestments()).get(0).getAccount().getAggregateId(),equalTo(getAccountB().getAggregateId()));
 		assertThat(new ArrayList<Investment>(getTarget2().getInvestments()).get(1).getAccount().getAggregateId(),equalTo(getAccountB().getAggregateId()));
 		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(new BigDecimal(30000))));
@@ -105,10 +111,19 @@ public class CreditTransferTest extends BaseTestCase{
 		gate.dispatch(new RewardCommand(getTarget2().getAggregateId().getId(),new BigDecimal(1)));
 		gate.dispatch(new RewardCommand(getTarget2().getAggregateId().getId(),new BigDecimal(2)));
 		gate.dispatch(new RewardCommand(getTarget2().getAggregateId().getId(),new BigDecimal(3)));
-		//assertThat(getTarget2().getInvestments().size(),equalTo(0));
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(30000)));
+		assertThat(getAccountA().getTotalBalance(),equalTo(new Money(30000)));
+		assertThat(getAccountB().getAvailableBalance(),equalTo(Money.ZERO));
+		assertThat(getAccountB().getTotalBalance(),equalTo(Money.ZERO));
+		transactionService.processTransaction();
+		assertThat(getAccountA().getAvailableBalance(),equalTo(new Money(30000)));
+		assertThat(getAccountA().getTotalBalance(),equalTo(new Money(30000)));
+		assertThat(getAccountB().getAvailableBalance(),equalTo(new Money(65000)));
+		assertThat(getAccountB().getTotalBalance(),equalTo(new Money(65000)));
+		assertThat(getTarget2().getOutstandingInvestments().isEmpty(),equalTo(true));
 
+		
 	}
- 
 	
 	
 

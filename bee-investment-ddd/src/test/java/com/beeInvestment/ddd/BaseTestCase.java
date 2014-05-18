@@ -30,6 +30,8 @@ import com.beeInvestment.application.RegisterCommand;
 import com.beeInvestment.customer.domain.Customer;
 import com.beeInvestment.investment.domain.Target;
 import com.beeInvestment.investment.domain.TargetRepository;
+import com.beeInvestment.investment.domain.TargetService;
+import com.beeInvestment.investment.domain.TargetServiceImpl;
 import com.beeInvestment.transaction.domain.TransactionService;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/functionalTestsContext.xml")
@@ -55,6 +57,8 @@ public abstract class BaseTestCase {
 	protected TargetRepository targetRepository;
 	@Inject
 	protected TransactionService transactionService;
+	@Inject
+	protected TargetService targetService;
 	@Before
 	/**
 	 * 1) Create two customers Cust A and Cust B
@@ -67,6 +71,7 @@ public abstract class BaseTestCase {
 	 * 
 	 */
 	public void setup(){
+		targetService.setNumberOfdays(0);
 		customerA=(Customer) gate.dispatch(new RegisterCommand());
 		assertThat(customerA.getAggregateId(),notNullValue());
 		gate.dispatch(new DepositCommand(customerA.getAggregateId().getId(),new BigDecimal(30000)));

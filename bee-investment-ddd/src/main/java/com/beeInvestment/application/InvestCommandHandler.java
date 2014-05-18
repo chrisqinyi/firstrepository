@@ -14,7 +14,6 @@ import com.beeInvestment.investment.domain.Investment;
 import com.beeInvestment.investment.domain.Target;
 import com.beeInvestment.investment.domain.TargetRepository;
 import com.beeInvestment.payment.domain.PaymentRepository;
-import com.beeInvestment.transaction.domain.Transaction;
 import com.beeInvestment.transaction.domain.TransactionRepository;
 
 @CommandHandlerAnnotation
@@ -44,10 +43,10 @@ public class InvestCommandHandler implements
 			throw new RuntimeException("customer has insufficent money");
 //		Payment payment = account.charge(new Money(command.getFund()));
 //		paymentRepository.save(payment);
-		Transaction t=target.invest(account, new Money(command.getFund()));
+		target.invest(account, new Money(command.getFund()));
 		//accountRepository.save(account);
-		//targetRepository.save(target);
-		transactionRepository.save(t);
+		targetRepository.save(target);
+		//transactionRepository.save(t);
 		return null;
 	}
 

@@ -56,6 +56,11 @@
 	</build>
 
 	<dependencies>
+	    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.7.0</version>
+    </dependency>
 		<dependency>
 			<groupId>org.beeInvestment</groupId>
 			<artifactId>bee-investment-command</artifactId>

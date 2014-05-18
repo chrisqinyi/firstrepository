@@ -85,6 +85,15 @@ public class Money implements Serializable {
 	public Money divideBy(BigDecimal divisor) {
 		return new Money(denomination.divide(divisor,2,RoundingMode.HALF_EVEN), currencyCode);
 	}
+	
+	public Money modBy(double divisor) {
+		return new Money(denomination.doubleValue()*100 % divisor /100);
+	}
+	
+	public Money modBy(BigDecimal divisor) {
+		return new Money(denomination.doubleValue()*100 % divisor.doubleValue()/100);
+	}
+	
 	public Money add(Money money) {
 		if (!compatibleCurrency(money)) {
 			throw new IllegalArgumentException("Currency mismatch");

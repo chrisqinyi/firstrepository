@@ -1,9 +1,10 @@
 package com.beeInvestment.ddd;
 
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Test;
+
+import com.beeInvestment.application.CancelTargetCommand;
+import com.beeInvestment.application.PublishTargetCommand;
+
 
 public class TargetTests extends BaseTestCase {
 	
@@ -30,10 +31,10 @@ public class TargetTests extends BaseTestCase {
 	 * 
 	 */
 	public void publishTargetTest(){
-//		Map criteria = null;
-//		List<Target> targets=customer.getTargetList(criteria);
-//	    user.publishTarget(new Target());	
-//	    customer.getTargetList(criteria);
+		gate.dispatch(new PublishTargetCommand(target1.getAggregateId().getId()));
+		gate.dispatch(new PublishTargetCommand(target2.getAggregateId().getId()));
+		gate.dispatch(new CancelTargetCommand(target1.getAggregateId().getId()));
+		gate.dispatch(new PublishTargetCommand(target1.getAggregateId().getId()));
 	}
 	
 			
