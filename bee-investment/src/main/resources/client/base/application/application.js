@@ -12,24 +12,3 @@ App.ResetScroll = Em.Mixin.create({
     }
 });
 
-App.Router.map(function() {
-    // this.resource('todos', {
-    // path : '/'
-    // }, function() {
-    // this.route('active');
-    // this.route('completed');
-    // });
-    this.route("login", {
-        path : "/"
-    });
-});
-
-App.ApplicationRoute = Em.Route.extend(App.ResetScroll, {
-    activate : function() {
-        this._super.apply(this, arguments);
-    }
-});
-
-Em.RSVP.configure('onerror', function(error) {
-    Em.Logger.assert(false, error);
-});

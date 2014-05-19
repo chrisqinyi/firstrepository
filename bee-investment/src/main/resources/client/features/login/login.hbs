@@ -4,7 +4,9 @@
 </div>
 <div>{{model.notice}}</div>
 <div>
-	UserName: {{focus-input-text-field id="username"}}
-	Password: {{input id="password" type="password"}}
-	{{spin-button id="loginSubmit" isLoading = isLoading buttonText="Login" action="submit"}}
+	<form id="loginForm" action="">
+		UserName: {{input id="username" name="username" type="text"}}<br/>
+		Password: {{input id="password" name="password" type="password"}}<br/>
+		<button id="loginSubmit" {{action "submit"}}>Login</button>
+	</form>
 </div>

@@ -5,4 +5,4 @@ App.BaseFeatureURLMapping.set("update-notice", "changeNotice");
 App.BaseFeatureURLMapping.set("query-notice", "changeNotice");
 App.BaseFeatureURLMapping.set("refresh-notice", "refreshNotice");
 
-// App.storage.notice = App.BaseModel.create();
+

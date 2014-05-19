@@ -1,1 +1,2 @@
-th {width: 100%}
+label.error {color: red;}
+input.error {border-color: red;}

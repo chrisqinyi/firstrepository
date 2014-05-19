@@ -71,5 +71,4 @@ App.WS = {
 
         return url + this.suffix;
     }
-
 };
