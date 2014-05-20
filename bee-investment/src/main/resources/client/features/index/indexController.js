@@ -1,4 +1,4 @@
-App.LoginController = Ember.Controller.extend({
+App.IndexController = Ember.Controller.extend({
     isLoading : false,
     actions : {
         submit : function() {

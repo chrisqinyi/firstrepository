@@ -1,4 +1,4 @@
-App.LoginView = Ember.View.extend({
+App.indexView = Ember.View.extend({
     didInsertElement : function() {
         $("#loginForm").validate({
             rules : {
