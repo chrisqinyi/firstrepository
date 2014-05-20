@@ -1,20 +1,34 @@
 <div style="width: 950px;">
-	<div style="height: 25px; background-color: gray; padding-top: 5px; margin-top: 5px; color: white; border: 1px solid black;">
+	<div
+		style="height: 25px; background-color: gray; padding-top: 5px; margin-top: 5px; color: white; border: 1px solid black;">
 		<div style="float: right; margin-right: 30px;">
 			<span style="color: orange;">400-XXX-XXXX</span>|<span {{action showLoginDialog}}>Login</span>|<span>Registration</span>|<span>Help</span>
 		</div>
 	</div>
-	<div style="height: 40px; padding-top: 20px; margin-top: 5px; border: 1px solid black;">
+	<div
+		style="height: 40px; padding-top: 20px; margin-top: 5px; border: 1px solid black;">
 		<div style="float: right; margin-right: 30px;">
-			<span style="margin-right: 10px;">Home</span> <span style="margin-right: 10px;">Invest</span> <span style="margin-right: 10px;">My Account</span> <span style="margin-right: 10px;">XXX</span>
+			<span style="margin-right: 10px;">Home</span> <span
+				style="margin-right: 10px;">Invest</span> <span
+				style="margin-right: 10px;">My Account</span> <span
+				style="margin-right: 10px;">XXX</span>
 		</div>
 	</div>
 </div>
 
-<div id="loginDialog" class="ui-dialog-content ui-widget-content" style="width: auto; min-height: 48px; max-height: none; height: auto;">
+<div id="loginDialog" class="ui-dialog-content ui-widget-content"
+	style="width: auto; min-height: 48px; max-height: none; height: auto;">
 	<form id="loginForm" action="">
-		UserName: {{input id="username" name="username" type="text"}}<br /> 
-		Password: {{input id="password" name="password" type="password"}}<br />
+		<table>
+			<tr>
+				<td>UserName:</td>
+				<td>{{input id="username" name="username" type="text"}}</td>
+			</tr>
+			<tr>
+				<td>Password:</td>
+				<td>{{input id="password" name="password" type="password"}}</td>
+			</tr>
+		</table>
 	</form>
 </div>
 
