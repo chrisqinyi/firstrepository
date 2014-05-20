@@ -10,7 +10,7 @@ App.Router.map(function() {
     });
 });
 
-App.LoginRoute = Ember.Route.extend({
+App.LoginRoute = App.BaseRoute.extend({
     model : function() {
         return App.storage.find('notice');
     }
